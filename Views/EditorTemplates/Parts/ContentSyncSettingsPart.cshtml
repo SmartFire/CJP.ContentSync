@@ -1,0 +1,54 @@
+﻿@using Orchard.Mvc.Html
+@using Orchard.Utility.Extensions
+@model CJP.ContentSync.Models.ContentSyncSettingsPart
+
+@{
+    Layout.Title = T("Content Sync Settings");
+}
+
+<div>
+    <h1>@T("Content Sync Settings")</h1>
+    <p class="hint">@T("These settings allow you to control exactly what can be exported by the Content Sync API endpoint.")</p>
+    <fieldset>
+        <legend>@T("Content Types to exclude")</legend>
+        <p>@T("Content types selected below will not be synced:")</p>
+        <ul>
+            @for (var i = 0; i < Model.AllContentTypes.Count; i++)
+            {
+                <li>
+                    <input type="hidden" value="@Model.AllContentTypes[i].Item" name="ContentSyncSettings.@Html.NameOf(m => m.AllContentTypes[i].Item)" />
+                    <input type="checkbox" value="true" @(Model.AllContentTypes[i].IsSelected ? "checked" : "") name="ContentSyncSettings.@Html.NameOf(m => m.AllContentTypes[i].IsSelected)" id="@Html.NameOf(m => m.AllContentTypes[i].IsSelected)" />
+                    <label class="forcheckbox" for="@Html.NameOf(m => m.AllContentTypes[i].IsSelected)">@Model.AllContentTypes[i].Item.CamelFriendly()</label>
+                </li>
+            }
+        </ul>
+    </fieldset>
+    <fieldset>
+        <legend>@T("Export Steps to be excluded")</legend>
+        <p>@T("Custom Export Steps selected below will be be included in the synchronization process:")</p>
+        <ul>
+            @for (var i = 0; i < Model.AllExportSteps.Count; i++)
+            {
+                <li>
+                    <input type="hidden" value="@Model.AllExportSteps[i].Item" name="ContentSyncSettings.@Html.NameOf(m => m.AllExportSteps[i].Item)" />
+                    <input type="checkbox" value="true" @(Model.AllExportSteps[i].IsSelected ? "checked" : "") name="ContentSyncSettings.@Html.NameOf(m => m.AllExportSteps[i].IsSelected)" id="@Html.NameOf(m => m.AllExportSteps[i].IsSelected)" />
+                    <label class="forcheckbox" for="@Html.NameOf(m => m.AllExportSteps[i].IsSelected)">@Model.AllExportSteps[i].Item.CamelFriendly()</label>
+                </li>
+            }
+        </ul>
+    </fieldset>
+    <fieldset>
+        <legend>@T("Site Settings to be excluded")</legend>
+        <p>@T("Any site settings selected below will not be synced. You can use this feature to prevent sensitive settings from being exported. Alternatively; you can also add redactions for site settings in order to mask settings, or transform them through environments:")</p>
+        <ul>
+            @for (var i = 0; i < Model.AllSiteSettings.Count; i++)
+            {
+                <li>
+                    <input type="hidden" value="@Model.AllSiteSettings[i].Item" name="ContentSyncSettings.@Html.NameOf(m => m.AllSiteSettings[i].Item)" />
+                    <input type="checkbox" value="true" @(Model.AllSiteSettings[i].IsSelected ? "checked" : "") name="ContentSyncSettings.@Html.NameOf(m => m.AllSiteSettings[i].IsSelected)" id="@Html.NameOf(m => m.AllSiteSettings[i].IsSelected)" />
+                    <label class="forcheckbox" for="@Html.NameOf(m => m.AllSiteSettings[i].IsSelected)">@Model.AllSiteSettings[i].Item.CamelFriendly()</label>
+                </li>
+            }
+        </ul>
+    </fieldset>
+</div>

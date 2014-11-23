@@ -50,6 +50,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web.Mvc, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\lib\aspnetmvc\System.Web.Mvc.dll</HintPath>
@@ -99,9 +100,17 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\RedactionsController.cs" />
     <Compile Include="Drivers\RedactedBodyPartDriver.cs" />
+    <Compile Include="Drivers\ContentSyncSettingsPartDriver.cs" />
+    <Compile Include="ExportSteps\RedactedSiteSettingsExportStep.cs" />
+    <Compile Include="Handlers\ContentSyncSettingsPartHandler.cs" />
+    <Compile Include="Models\SelectableItem.cs" />
+    <Compile Include="Models\ContentSyncSettingsPart.cs" />
+    <Compile Include="Models\ContentSyncSettingsRecord.cs" />
     <Compile Include="Models\RedactionOperationStatus.cs" />
     <Compile Include="Models\RemoteSiteConfigRecord.cs" />
     <Compile Include="Models\SnapshotRecord.cs" />
+    <Compile Include="RecipeHandlers\RedactionsRecipeHandler.cs" />
+    <Compile Include="RecipeHandlers\RedactedSettingsRecipeHandler.cs" />
     <Compile Include="Services\DefaultTextRedactionService.cs" />
     <Compile Include="Services\ITextRedactionService.cs" />
     <Compile Include="Models\RedactionRecord.cs" />
@@ -150,6 +159,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Redactions\Edit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Placement.info" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\EditorTemplates\Parts\ContentSyncSettingsPart.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

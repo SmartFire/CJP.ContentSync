@@ -20,7 +20,7 @@
             @foreach (var config in Model.SavedRemoteSiteConfigs)
             {
                 <tr>
-                    <td>@config.Url</td>
+                    <td><a href="@config.Url" target="_blank">@config.Url</a></td>
                     <td>@config.Username</td>
                     <td>@(config.LastSynced.HasValue ?config.LastSynced.ToString():"Never")</td>
                     <td>
