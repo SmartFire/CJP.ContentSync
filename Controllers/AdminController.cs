@@ -47,6 +47,9 @@ namespace CJP.ContentSync.Controllers
         [FormValueRequired("syncContent")]
         public ActionResult IndexPost(AdminImportVM vm)
         {
+            // sets the setup request timeout to 10 minutes to give enough time to execute custom recipes.  
+            HttpContext.Server.ScriptTimeout = 600;
+
             var result = _contentExportService.GetContentExportFromUrl(vm.Url, vm.Username, vm.Password);
 
             if (result.Status == ApiResultStatus.Unauthorized)

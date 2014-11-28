@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using CJP.ContentSync.Models;
 using Orchard;
 using Orchard.ContentManagement;
 using Orchard.Core.Common.Models;
@@ -13,6 +14,7 @@ namespace CJP.ContentSync.ExportSteps
     public class ContentTrimExportStep : IExportEventHandler, ICustomExportStep
     {
         private readonly IContentManager _contentManager;
+        private readonly IOrchardServices _orchardServices;
         /* <ContentTrim>
          *   <ContentTypes>
          *      <add type="page"/>
@@ -24,9 +26,10 @@ namespace CJP.ContentSync.ExportSteps
          *   </ContentType>
          *  </ContentTrim>
          */
-        public ContentTrimExportStep(IContentManager contentManager) 
+        public ContentTrimExportStep(IContentManager contentManager, IOrchardServices orchardServices) 
         {
             _contentManager = contentManager;
+            _orchardServices = orchardServices;
 
             Logger = NullLogger.Instance;
             T = NullLocalizer.Instance;
@@ -39,12 +42,11 @@ namespace CJP.ContentSync.ExportSteps
             if (!context.ExportOptions.CustomSteps.Contains("ContentTrim")) { return; }
 
             var xmlElement = new XElement("ContentTrim");
-
             var contentTypesElement = new XElement("ContentTypes");
 
-            var contentToExclude = new[] {"Site", "User"};
-            var contentTypes = _contentManager.GetContentTypeDefinitions().Where(c => !contentToExclude.Contains(c.Name));
-            var contentTypeNames = contentTypes.Select(c => c.Name).ToList();
+            var settings = _orchardServices.WorkContext.CurrentSite.As<ContentSyncSettingsPart>();
+
+            var contentTypeNames = _contentManager.GetContentTypeDefinitions().Select(ctd => ctd.Name).Except(settings.ExcludedContentTypes).ToList();
 
             foreach (var contentType in contentTypeNames)
             {

@@ -90,6 +90,10 @@
       <Project>{CDE24A24-01D3-403C-84B9-37722E18DFB7}</Project>
       <Name>Orchard.Themes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Orchard.Users\Orchard.Users.csproj">
+      <Project>{79AED36E-ABD0-4747-93D3-8722B042454B}</Project>
+      <Name>Orchard.Users</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orchard.Widgets\Orchard.Widgets.csproj">
       <Project>{194D3CCC-1153-474D-8176-FDE8D7D0D0BD}</Project>
       <Name>Orchard.Widgets</Name>
@@ -109,9 +113,13 @@
     <Compile Include="Models\RedactionOperationStatus.cs" />
     <Compile Include="Models\RemoteSiteConfigRecord.cs" />
     <Compile Include="Models\SnapshotRecord.cs" />
+    <Compile Include="ExtensionMethods\ContentTypeExtensions.cs" />
     <Compile Include="RecipeHandlers\RedactionsRecipeHandler.cs" />
     <Compile Include="RecipeHandlers\RedactedSettingsRecipeHandler.cs" />
+    <Compile Include="Services\DefaultRealtimeFeedbackService.cs" />
     <Compile Include="Services\DefaultTextRedactionService.cs" />
+    <Compile Include="Models\FeedbackLevel.cs" />
+    <Compile Include="Services\IRealtimeFeedbackService.cs" />
     <Compile Include="Services\ITextRedactionService.cs" />
     <Compile Include="Models\RedactionRecord.cs" />
     <Compile Include="ExportSteps\CurrentThemeExportStep.cs" />
@@ -145,6 +153,7 @@
     <Compile Include="Services\IContentMigrationManager.cs" />
     <Compile Include="Services\IContentMigrationStateService.cs" />
     <Compile Include="Models\MigrationExectutionSummary.cs" />
+    <Compile Include="ExtensionMethods\RealtimeFeedbackServiceExtensions.cs" />
     <Compile Include="Tasks\SnapshotTask.cs" />
     <Compile Include="Tasks\SnapshotTasnkManager.cs" />
   </ItemGroup>

@@ -1,4 +1,6 @@
-﻿@using CJP.ContentSync.Permissions
+﻿@using System.Web.Mvc.Html
+@using CJP.ContentSync.Permissions
+@using Orchard.Mvc.Html
 @model CJP.ContentSync.Models.AdminImportVM
 
 @{
@@ -28,6 +30,7 @@
                         {
                             @Html.Hidden("id", config.Id)
                             <button type="submit" name="sync" value="sync" class="link">@T("Sync with this config")</button> <text> | </text>
+                            <a href="@config.Url/contentsync/contentExport?username=@config.Username&password=@config.Password">@T("Download remote export")</a> <text> | </text>
                             <button type="submit" name="delete" value="delete" class="link">@T("Delete")</button>
                         }
                     </td>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using CJP.ContentSync.ExtensionMethods;
 using CJP.ContentSync.Models;
 using CJP.ContentSync.Services;
 using Orchard.Localization;
@@ -10,10 +11,12 @@ using Orchard.Recipes.Services;
 namespace CJP.ContentSync.RecipeHandlers {
     public class RedactionsRecipeHandler : IRecipeHandler {
         private readonly ITextRedactionService _textRedactionService;
+        private readonly IRealtimeFeedbackService _realtimeFeedbackService;
 
-        public RedactionsRecipeHandler(ITextRedactionService textRedactionService)
+        public RedactionsRecipeHandler(ITextRedactionService textRedactionService, IRealtimeFeedbackService realtimeFeedbackService)
         {
             _textRedactionService = textRedactionService;
+            _realtimeFeedbackService = realtimeFeedbackService;
             Logger = NullLogger.Instance;
             T = NullLocalizer.Instance;
         }
@@ -32,13 +35,20 @@ namespace CJP.ContentSync.RecipeHandlers {
             {
                 return;
             }
+            _realtimeFeedbackService.Info(T("Starting 'Redactions' step"));
 
             var redactions = recipeContext.RecipeStep.Step.Descendants().Where(f => f.Name == "add");
             foreach (var redaction in redactions)
             {
-                _textRedactionService.AddRedaction(new RedactionRecord { Placeholder = redaction.Attribute("Placeholder").Value, Regex = redaction.Attribute("Regex").Value, ReplaceWith = redaction.Attribute("ReplaceWith").Value, });
+                var placeholder = redaction.Attribute("Placeholder").Value;
+                var regex = redaction.Attribute("Regex").Value;
+                var replaceWith = redaction.Attribute("ReplaceWith").Value;
+
+                _realtimeFeedbackService.Info(T("Adding redaction {0} to match regex {1} and relace with {2}", placeholder, regex, replaceWith));
+                _textRedactionService.AddRedaction(new RedactionRecord { Placeholder = placeholder, Regex = regex, ReplaceWith = replaceWith, });
             }
 
+            _realtimeFeedbackService.Info(T("Step 'Redactions' has finished"));
             recipeContext.Executed = true;
         }
     }
