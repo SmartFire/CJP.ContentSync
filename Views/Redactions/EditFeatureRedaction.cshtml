@@ -1,0 +1,34 @@
+﻿@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@using Orchard.Mvc.Html
+@model CJP.ContentSync.Models.FeatureRedactionRecord
+
+@{
+    Layout.Title = T("Content Sync - Feature Redactions");
+}
+
+@using (Html.BeginFormAntiForgeryPost()) {
+    <div>
+        @Html.LabelFor(m => m.FeatureId, T("Feature ID"))
+        @Html.TextBoxFor(m => m.FeatureId)
+        <span class="hint">
+            @T("eg Orchard.Azure")
+        </span>
+    </div>
+
+    <div>
+        @Html.LabelFor(m => m.Enabled, T("State"))
+        @Html.DropDownListFor(m => m.Enabled, new List<SelectListItem> {
+            new SelectListItem{Selected = Model.Enabled, Value = "true", Text = "Enabled"},
+            new SelectListItem{Selected = !Model.Enabled, Value = "false", Text = "Disabled"},
+        })
+    </div>
+
+    <div class="actions">
+        @if (Model.Id != 0)
+        {
+            <button type="submit" name="delete" value="delete" class="button grey">@T("Delete")</button>
+        }
+        <button type="submit" name="save" value="save">@T("Save")</button>
+    </div>
+}

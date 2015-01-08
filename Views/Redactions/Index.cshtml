@@ -1,35 +1,93 @@
-﻿@model IEnumerable<CJP.ContentSync.Models.RedactionRecord>
+﻿@using System.Web.Mvc.Html
+@model CJP.ContentSync.Models.ViewModels.RedactionsIndexVM
 
-@{
-    Layout.Title = T("Content Sync - Redactions");
-}
-
-<p>
-    @T("Redactions allow you to remove values from content when exporting, and then replace them with different values when importing. A good use of this would be to change the path of media files embedded into content if it differed between your environments.")
-</p>
-<div class="manage">
-    @Html.ActionLink(T("Add").Text, "Edit", "Redactions", null, new { @class = "button primaryAction" })
-</div>
-<br/>
-<br/>
-
-<table class="items">
-    <tr>
-        <th>@T("Regex to match")</th>
-        <th>@T("Placeholder")</th>
-        <th>@T("Replace with")</th>
-        <th></th>
-    </tr>
-    @foreach (var redaction in Model) {
-        <tr>
-            <td>@redaction.Regex</td>
-            <td>@redaction.Placeholder</td>
-            <td>@redaction.ReplaceWith</td>
-            <td>@Html.ActionLink(T("Edit").Text, "Edit", "Redactions", new { redaction.Id }, null)</td>
-        </tr>
+    @{
+        Layout.Title = T("Content Sync - Redactions");
     }
-</table>
 
-<span class="hint">
-    @T("Note- the redactions are performed in the order specified above. If a piece of text matches multiple regexes, the placeholders will be applied in the order above.")
-</span>
+<fieldset>
+    <legend>@T("Content Redactions")</legend>
+    @T("Content Redactions allow you to remove values from content when exporting, and then replace them with different values when importing. A good use of this would be to change the path of media files embedded into content if it differed between your environments.")
+    <div class="manage">
+        @Html.ActionLink(T("Add").Text, "EditContentRedaction", "Redactions", null, new { @class = "button primaryAction" })
+    </div>
+    <br />
+    <br />
+    @if (Model.ContentRedactions.Any()) {
+        <table class="items">
+            <tr>
+                <th width="35%">@T("Regex to match")</th>
+                <th width="20%">@T("Placeholder")</th>
+                <th width="35%">@T("Replace with")</th>
+                <th width="10%"></th>
+            </tr>
+            @foreach (var redaction in Model.ContentRedactions) {
+                <tr>
+                    <td>@redaction.Regex</td>
+                    <td>@redaction.Placeholder</td>
+                    <td>@redaction.ReplaceWith</td>
+                    <td>@Html.ActionLink(T("Edit").Text, "EditContentRedaction", "Redactions", new {redaction.Id}, null)</td>
+                </tr>
+            }
+        </table>
+
+        <span class="hint">
+            @T("Note- the redactions are performed in the order specified above. If a piece of text matches multiple regexes, the placeholders will be applied in the order above.")
+        </span>
+    }
+</fieldset>
+
+
+<fieldset>
+    <legend>@T("Feature Redactions")</legend>
+    @T("Feature Redactions allow you to override the state of features as specified by the Feature Sync tool. For example, you may want to diable a feature locally, but have it enabled on a remote environment.")
+    <div class="manage">
+        @Html.ActionLink(T("Add").Text, "EditFeatureRedaction", "Redactions", null, new { @class = "button primaryAction" })
+    </div>
+    <br />
+    <br />
+    @if (Model.FeatureRedactions.Any()) {
+        <table class="items">
+            <tr>
+                <th width="45%">@T("Feature")</th>
+                <th width="45%">@T("State")</th>
+                <th width="10%"></th>
+            </tr>
+            @foreach (var redaction in Model.FeatureRedactions) {
+                <tr>
+                    <td>@redaction.FeatureId</td>
+                    <td>@(redaction.Enabled ? "Enabled" : "Disabled")</td>
+                    <td>@Html.ActionLink(T("Edit").Text, "EditFeatureRedaction", "Redactions", new {redaction.Id}, null)</td>
+                </tr>
+            }
+        </table>
+    }
+</fieldset>
+
+
+<fieldset>
+    <legend>@T("Setting Redactions")</legend>
+    @T("Setting Redactions allow you to provide environment specific settings that won't be overridden when the remote site's settings are imported.")
+    <div class="manage">
+        @Html.ActionLink(T("Add").Text, "EditSettingRedaction", "Redactions", null, new { @class = "button primaryAction" })
+    </div>
+    <br />
+    <br />
+    @if (Model.SettingRedactions.Any()) {
+        <table class="items">
+            <tr>
+                <th width="45%">@T("Setting")</th>
+                <th width="45%">@T("Value")</th>
+                <th width="10%"></th>
+            </tr>
+            @foreach (var redaction in Model.SettingRedactions) {
+                <tr>
+                    <td>@redaction.SettingName</td>
+                    <td>@redaction.Value</td>
+                    <td>@Html.ActionLink(T("Edit").Text, "EditSettingRedaction", "Redactions", new {redaction.Id}, null)</td>
+                </tr>
+            }
+        </table>
+    }
+</fieldset>
+

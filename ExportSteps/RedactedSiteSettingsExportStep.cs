@@ -14,10 +14,10 @@ namespace CJP.ContentSync.ExportSteps
 {
     public class RedactedSiteSettingsExportStep : IExportEventHandler, ICustomExportStep
     {
-        private readonly ITextRedactionService _textRedactionService;
+        private readonly IContentRedactionService _textRedactionService;
         private readonly IOrchardServices _orchardServices;
 
-        public RedactedSiteSettingsExportStep(ITextRedactionService textRedactionService, IOrchardServices orchardServices) 
+        public RedactedSiteSettingsExportStep(IContentRedactionService textRedactionService, IOrchardServices orchardServices) 
         {
             _textRedactionService = textRedactionService;
             _orchardServices = orchardServices;

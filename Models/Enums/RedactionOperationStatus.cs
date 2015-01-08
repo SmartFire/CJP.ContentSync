@@ -1,9 +1,9 @@
-namespace CJP.ContentSync.Models {
+namespace CJP.ContentSync.Models.Enums {
     public enum RedactionOperationStatus
     {
         Created,
         Updated,
         Removed,
-        PlaceholderNotUnique
+        NotUnique
     }
 }

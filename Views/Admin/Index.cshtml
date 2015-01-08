@@ -1,14 +1,30 @@
 ﻿@using System.Web.Mvc.Html
 @using CJP.ContentSync.Permissions
 @using Orchard.Mvc.Html
-@model CJP.ContentSync.Models.AdminImportVM
+@model CJP.ContentSync.Models.ViewModels.AdminImportVM
 
 @{
     Layout.Title = T("Content Sync");
+    Script.Require("jQuery").AtHead();
+
+    var hideAddSitePanel = true;
 }
 
+<script>
+    $(function () {
+        $("button.deleteRemoteConfig").on("click", function () {
+            return confirm("Are you sure you want to delete this remote site configuration?");
+        });
+
+        $("a.siteAddPanelControl").on("click", function () {
+            $(this).hide();
+            $("fieldset#addConfigFieldset").show();
+        });
+    });
+</script>
+
 <fieldset>
-    <legend>@T("Site details")</legend>
+    <legend>@T("Your remote sites")</legend>
     @if (Model.SavedRemoteSiteConfigs.Any())
     {
         <p>@T("Your saved remote sites:")</p>
@@ -31,26 +47,28 @@
                             @Html.Hidden("id", config.Id)
                             <button type="submit" name="sync" value="sync" class="link">@T("Sync with this config")</button> <text> | </text>
                             <a href="@config.Url/contentsync/contentExport?username=@config.Username&password=@config.Password">@T("Download remote export")</a> <text> | </text>
-                            <button type="submit" name="delete" value="delete" class="link">@T("Delete")</button>
+                            <button type="submit" name="delete" value="delete" class="link deleteRemoteConfig">@T("Delete")</button>
                         }
                     </td>
                 </tr>
             }
         </table>
+        <div class="actions">
+            <a class="button siteAddPanelControl">@T("Add a new remote site config...")</a>
+        </div>
     }
     else
     {
-        <p>@T("You have no saved remote site details. Clicking 'Save Config' below will allow you to save remote site details for use later.")</p>
-        <p class="hint">@T(" Note: passwords are stored in plain text. You should ensure that the user account you save has only the '{0}' permission.", ContentSyncPermissions.ContentExportApi.Name)</p>
+        <p>@T("You have no saved remote site details. You can add a remote site below:")</p>
+
+        hideAddSitePanel = false;
     }
     
-    <hr/>
-
+</fieldset>
+<fieldset id="addConfigFieldset" style="display:@(hideAddSitePanel?"none":"block")">
+    <legend>@T("Add a remote site configuration")</legend>
     @using (Html.BeginFormAntiForgeryPost())
     {
-        <p>
-            @T("You can manually provide the required details for the remote site to sync with.")
-        </p>
         <p>
             @T("Provide the URL for the remote site, and the Username and Password of a user that has the correct permissions to provide a site export:")
         </p>
@@ -67,11 +85,11 @@
         <div>
             @Html.LabelFor(m => m.Password)
             @Html.PasswordFor(m => m.Password)
+            <p class="hint">@T(" Note: passwords are stored in plain text. You should ensure that the user account you save has only the '{0}' permission.", ContentSyncPermissions.ContentExportApi.Name)</p>
             <span class="hint">@T("The password for the account specified above")</span>
         </div>
         <div class="actions">
-            <button type="submit" name="saveConfig" value="saveConfig" class="button grey">@T("Save Config")</button>
-            <button type="submit" name="syncContent" value="syncContent">@T("Sync Content")</button>
+            <button type="submit" name="saveConfig" value="saveConfig">@T("Save Config")</button>
         </div>
     }
 </fieldset>

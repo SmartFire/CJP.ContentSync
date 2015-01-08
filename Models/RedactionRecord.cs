@@ -1,4 +1,5 @@
-namespace CJP.ContentSync.Models {
+namespace CJP.ContentSync.Models
+{
     public class RedactionRecord
     {
         public virtual int Id { get; set; }

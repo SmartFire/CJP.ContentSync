@@ -1,33 +1,28 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using CJP.ContentSync.Models;
+using CJP.ContentSync.Models.Enums;
+using CJP.ContentSync.Models.ViewModels;
 using CJP.ContentSync.Services;
 using Orchard;
 using Orchard.Data;
-using Orchard.ImportExport.Services;
 using Orchard.Localization;
 using Orchard.Logging;
 using Orchard.Mvc;
-using Orchard.Recipes.Models;
-using Orchard.Recipes.Services;
 using Orchard.UI.Notify;
 
 namespace CJP.ContentSync.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly IImportExportService _importExportService;
         private readonly IOrchardServices _orchardServices;
-        private readonly IContentExportService _contentExportService;
-        private readonly IRecipeJournal _recipeJournal;
         private readonly IRepository<RemoteSiteConfigRecord> _remoteConfigRepository;
+        private readonly IContentSyncService _contentSyncService;
 
-        public AdminController(IImportExportService importExportService, IOrchardServices orchardServices, IContentExportService contentExportService, IRecipeJournal recipeJournal, IRepository<RemoteSiteConfigRecord> remoteConfigRepository) {
-            _importExportService = importExportService;
+        public AdminController(IOrchardServices orchardServices, IRepository<RemoteSiteConfigRecord> remoteConfigRepository, IContentSyncService contentSyncService) {
             _orchardServices = orchardServices;
-            _contentExportService = contentExportService;
-            _recipeJournal = recipeJournal;
             _remoteConfigRepository = remoteConfigRepository;
+            _contentSyncService = contentSyncService;
 
             T = NullLocalizer.Instance;
             Logger = NullLogger.Instance;
@@ -44,55 +39,11 @@ namespace CJP.ContentSync.Controllers
 
         [HttpPost]
         [ActionName("Index")]
-        [FormValueRequired("syncContent")]
-        public ActionResult IndexPost(AdminImportVM vm)
-        {
-            // sets the setup request timeout to 10 minutes to give enough time to execute custom recipes.  
-            HttpContext.Server.ScriptTimeout = 600;
-
-            var result = _contentExportService.GetContentExportFromUrl(vm.Url, vm.Username, vm.Password);
-
-            if (result.Status == ApiResultStatus.Unauthorized)
-            {
-                _orchardServices.Notifier.Warning(T("Either the username and password you supplied is incorrect, or this user does not have the correct permissions to export content"));
-                return View("Index", vm);
-            }
-
-            if (result.Status == ApiResultStatus.Failed)
-            {
-                _orchardServices.Notifier.Error(T("There was an unexpected error when trying to export the remote site"));
-                return View("Index", vm);
-            }
-
-            _orchardServices.Notifier.Information(T("Site content and configurations have been downloaded and will now be imported"));
-            var executionId = _importExportService.Import(result.Text);
-            var journal = _recipeJournal.GetRecipeJournal(executionId);
-
-            if (journal.Status == RecipeStatus.Complete)
-            {
-                _orchardServices.Notifier.Information(T("Site content has been synced"));
-                return View("Index", new AdminImportVM());
-            }
-
-            if (journal.Status == RecipeStatus.Started){
-                _orchardServices.Notifier.Information(T("Site content is in the process of being synced, but has not yet completed. You can refresh this page to monitor the progress of your sync"));
-            }
-            else
-            {
-                _orchardServices.Notifier.Warning(T("The import from the remote site failed"));
-            }
-
-            return RedirectToAction("ImportResult", "Admin", new { ExecutionId = executionId, area = "Orchard.ImportExport" });
-        }
-
-        [HttpPost]
-        [ActionName("Index")]
         [FormValueRequired("saveConfig")]
         public ActionResult IndexPostSave(AdminImportVM vm)
         {
             _remoteConfigRepository.Create(new RemoteSiteConfigRecord
             {
-                //LastSynced = null,
                 Url = vm.Url,
                 Username = vm.Username,
                 Password = vm.Password
@@ -106,16 +57,38 @@ namespace CJP.ContentSync.Controllers
         [HttpPost]
         [ActionName("RemoteConfig")]
         [FormValueRequired("sync")]
-        public ActionResult RemoteConfigPostSync(int id) {
-            var config = _remoteConfigRepository.Get(id);
+        public ActionResult RemoteConfigPostSync(int id) 
+        {
+            _orchardServices.WorkContext.HttpContext.Server.ScriptTimeout = 600;
 
-            if (config == null)
+            var result = _contentSyncService.Sync(id);
+
+            switch (result.Status)
             {
-                _orchardServices.Notifier.Warning(T("The site details you attempted to sync with no longer exist."));
-                return RedirectToAction("Index");
+                case ContentSyncResultStatus.RemoteSiteConfigDoesNotExist:
+                    _orchardServices.Notifier.Warning(T("The site details you attempted to sync with no longer exist."));
+                    break;
+                case ContentSyncResultStatus.RemoteUrlTimedout:
+                    _orchardServices.Notifier.Error(T("There was an unexpected error when trying to export the remote site. The remote site was not accessible."));
+                    break;
+                case ContentSyncResultStatus.RemoteUrlUnauthorized:
+                    _orchardServices.Notifier.Warning(T("Either the username and password you supplied is incorrect, or this user does not have the correct permissions to export content."));
+                    break;
+                case ContentSyncResultStatus.RemoteUrlFailed:
+                    _orchardServices.Notifier.Warning(T("The remote site failed to return an export of its content."));
+                    break;
+                case ContentSyncResultStatus.RecipeExecutionPending:
+                    _orchardServices.Notifier.Information(T("The remote site's content export has been downloaded and is now in the process of being imported."));
+                    break;
+                case ContentSyncResultStatus.RecipeExecutionFailed:
+                    _orchardServices.Notifier.Error(T("The remote site's content export has been downloaded, but there was an error when trying to import the content."));
+                    return RedirectToAction("ImportResult", "Admin", new { ExecutionId = result.RecipeExecutionId, area = "Orchard.ImportExport" });
+                case ContentSyncResultStatus.OK:
+                    _orchardServices.Notifier.Information(T("Site content has been synced."));
+                    break;
             }
-
-            return IndexPost(new AdminImportVM {Password = config.Password, Url = config.Url, Username = config.Username});
+            
+            return RedirectToAction("Index");
         }
 
         [HttpPost]

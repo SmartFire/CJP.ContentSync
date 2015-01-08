@@ -40,7 +40,7 @@ namespace CJP.ContentSync.Controllers.API
             }
 
 
-            var filePath = _contentExportService.GetContentExportText();
+            var filePath = _contentExportService.GetContentExportFilePath();
 
             return File(filePath, "text/xml", "export.xml");
         }

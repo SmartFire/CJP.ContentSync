@@ -12,9 +12,9 @@ namespace CJP.ContentSync.Drivers {
     [OrchardSuppressDependency("Orchard.Core.Common.Drivers.BodyPartDriver")]
     [UsedImplicitly]
     public class RedactedBodyPartDriver : BodyPartDriver {
-        private readonly ITextRedactionService _textRedactionService;
+        private readonly IContentRedactionService _textRedactionService;
 
-        public RedactedBodyPartDriver(IOrchardServices services, IEnumerable<IHtmlFilter> htmlFilters, RequestContext requestContext, ITextRedactionService textRedactionService)
+        public RedactedBodyPartDriver(IOrchardServices services, IEnumerable<IHtmlFilter> htmlFilters, RequestContext requestContext, IContentRedactionService textRedactionService)
             : base(services, htmlFilters, requestContext) {
             _textRedactionService = textRedactionService;
         }

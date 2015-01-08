@@ -9,11 +9,11 @@ using Orchard.Logging;
 
 namespace CJP.ContentSync.ExportSteps
 {
-    public class EnabledFeaturesExportStep : IExportEventHandler, ICustomExportStep
+    public class FeatureSyncExportStep : IExportEventHandler, ICustomExportStep
     {
         private readonly IFeatureManager _featureManager;
 
-        public EnabledFeaturesExportStep(IFeatureManager featureManager) 
+        public FeatureSyncExportStep(IFeatureManager featureManager) 
         {
             _featureManager = featureManager;
 

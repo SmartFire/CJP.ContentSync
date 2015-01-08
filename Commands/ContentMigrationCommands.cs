@@ -2,22 +2,19 @@
 using CJP.ContentSync.Models;
 using CJP.ContentSync.Services;
 using Orchard.Commands;
-using Orchard.ImportExport.Services;
-using Orchard.Recipes.Services;
+using Orchard.Data;
 
 namespace CJP.ContentSync.Commands {
     public class ContentMigrationCommands : DefaultOrchardCommandHandler {
         private readonly IContentMigrationManager _contentMigrationManager;
-        private readonly IContentExportService _contentExportService;
-        private readonly IImportExportService _importExportService;
-        private readonly IRecipeJournal _recipeJournal;
+        private readonly IContentSyncService _contentSyncService;
+        private readonly IRepository<RemoteSiteConfigRecord> _repository;
 
-        public ContentMigrationCommands(IContentMigrationManager contentMigrationManager, IContentExportService contentExportService, IImportExportService importExportService, IRecipeJournal recipeJournal)
+        public ContentMigrationCommands(IContentMigrationManager contentMigrationManager, IContentSyncService contentSyncService, IRepository<RemoteSiteConfigRecord> repository)
         {
             _contentMigrationManager = contentMigrationManager;
-            _contentExportService = contentExportService;
-            _importExportService = importExportService;
-            _recipeJournal = recipeJournal;
+            _contentSyncService = contentSyncService;
+            _repository = repository;
         }
 
 
@@ -59,38 +56,26 @@ namespace CJP.ContentSync.Commands {
         [CommandName("CJP contentsync from remote")]
         [CommandHelp("CJP contentsync from remote\r\n\t" + "Gets an export from the remote site and syncs this site with it")]
         [OrchardSwitches("Url,Username,Password")]
+        public void RemoteSyncWithCredentials(){
+
+            var result = _contentSyncService.Sync(Url, Username, Password);
+            Context.Output.WriteLine(T("Content Sync finished with status {0}", result.Status));
+        }
+
+
+        [CommandName("CJP contentsync from saved config")]
+        [CommandHelp("CJP contentsync from saved config\r\n\t" + "Gets an export from the remote site and syncs this site with it")]
+        [OrchardSwitches("Url")]
         public void RemoteSync() {
-            var result = _contentExportService.GetContentExportFromUrl(Url, Username, Password);
-
-
-            if (result.Status == ApiResultStatus.Unauthorized)
+            var record = _repository.Fetch(c => c.Url == Url).FirstOrDefault();
+            if (record == null)
             {
-                Context.Output.WriteLine(T("Either the username and password you supplied is incorrect, or this user does not have the correct permissions to export content"));
+                Context.Output.WriteLine(T("Could not sync with the remote site {0} because there is no saved remote site config with the url {0}", Url));
                 return;
             }
 
-            if (result.Status == ApiResultStatus.Failed)
-            {
-                Context.Output.WriteLine(T("There was an unexpected error when trying to export the remote site"));
-                return;
-            }
-
-            Context.Output.WriteLine(T("Site content and configurations have been downloaded and will now be imported"));
-            var executionId = _importExportService.Import(result.Text);
-
-            var journal = _recipeJournal.GetRecipeJournal(executionId);
-
-            //if (journal.Status == RecipeStatus.Complete) {
-            //    Context.Output.WriteLine(T("You site has been synced with the remote site at {0}", Url));
-            //}
-            //else
-            //{
-            //    Context.Output.WriteLine(T("The remote site was successfully exported at {0}, but the import failed:", Url));
-            //    foreach (var message in journal.Messages)
-            //    {
-            //        Context.Output.WriteLine(T(message.Message));
-            //    }
-            //}
+            var result = _contentSyncService.Sync(record.Url, record.Username, record.Password);
+            Context.Output.WriteLine(T("Content Sync finished with status {0}", result.Status));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CJP.ContentSync.Models;
+using CJP.ContentSync.Models.Enums;
 using Orchard;
 using Orchard.Localization;
 

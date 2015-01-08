@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 
-namespace CJP.ContentSync.Models {
+namespace CJP.ContentSync.Models.ViewModels {
     public class AdminImportVM
     {
         public AdminImportVM() {

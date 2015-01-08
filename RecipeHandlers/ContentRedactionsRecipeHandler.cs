@@ -9,11 +9,11 @@ using Orchard.Recipes.Models;
 using Orchard.Recipes.Services;
 
 namespace CJP.ContentSync.RecipeHandlers {
-    public class RedactionsRecipeHandler : IRecipeHandler {
-        private readonly ITextRedactionService _textRedactionService;
+    public class ContentRedactionsRecipeHandler : IRecipeHandler {
+        private readonly IContentRedactionService _textRedactionService;
         private readonly IRealtimeFeedbackService _realtimeFeedbackService;
 
-        public RedactionsRecipeHandler(ITextRedactionService textRedactionService, IRealtimeFeedbackService realtimeFeedbackService)
+        public ContentRedactionsRecipeHandler(IContentRedactionService textRedactionService, IRealtimeFeedbackService realtimeFeedbackService)
         {
             _textRedactionService = textRedactionService;
             _realtimeFeedbackService = realtimeFeedbackService;
@@ -25,17 +25,18 @@ namespace CJP.ContentSync.RecipeHandlers {
         public ILogger Logger { get; set; }
 
         /*  
-         <Redactions>
+         <ContentRedactions>
           <add Regex="Production" Placeholder="EnvironmentName" ReplaceWith="Local" />
-         </Redactions>
+         </ContentRedactions>
         */
         // Add a set of redactions
         public void ExecuteRecipeStep(RecipeContext recipeContext) {
-            if (!String.Equals(recipeContext.RecipeStep.Name, "Redactions", StringComparison.OrdinalIgnoreCase))
+            if (!String.Equals(recipeContext.RecipeStep.Name, "ContentRedactions", StringComparison.OrdinalIgnoreCase)
+                && !String.Equals(recipeContext.RecipeStep.Name, "Redactions", StringComparison.OrdinalIgnoreCase))//this check is for legacy reasons
             {
                 return;
             }
-            _realtimeFeedbackService.Info(T("Starting 'Redactions' step"));
+            _realtimeFeedbackService.Info(T("Starting 'Content Redactions' step"));
 
             var redactions = recipeContext.RecipeStep.Step.Descendants().Where(f => f.Name == "add");
             foreach (var redaction in redactions)
@@ -44,11 +45,11 @@ namespace CJP.ContentSync.RecipeHandlers {
                 var regex = redaction.Attribute("Regex").Value;
                 var replaceWith = redaction.Attribute("ReplaceWith").Value;
 
-                _realtimeFeedbackService.Info(T("Adding redaction {0} to match regex {1} and relace with {2}", placeholder, regex, replaceWith));
+                _realtimeFeedbackService.Info(T("Adding content redaction {0} to match regex {1} and relace with {2}", placeholder, regex, replaceWith));
                 _textRedactionService.AddRedaction(new RedactionRecord { Placeholder = placeholder, Regex = regex, ReplaceWith = replaceWith, });
             }
 
-            _realtimeFeedbackService.Info(T("Step 'Redactions' has finished"));
+            _realtimeFeedbackService.Info(T("Step 'Content Redactions' has finished"));
             recipeContext.Executed = true;
         }
     }

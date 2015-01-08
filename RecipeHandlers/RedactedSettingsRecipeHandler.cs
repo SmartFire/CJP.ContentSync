@@ -14,13 +14,13 @@ namespace CJP.ContentSync.RecipeHandlers {
     //This handler is similar to the standard settings import handler taken from Orchard.Recipe. Main difference is the added ability to restore redacted text
     public class RedactedSettingsRecipeHandler : IRecipeHandler {
         private readonly ISiteService _siteService;
-        private readonly ITextRedactionService _textRedactionService;
+        private readonly ISettingRedactionService _settingRedactionService;
         private readonly IRealtimeFeedbackService _realtimeFeedbackService;
 
-        public RedactedSettingsRecipeHandler(ISiteService siteService, ITextRedactionService textRedactionService, IRealtimeFeedbackService realtimeFeedbackService)
+        public RedactedSettingsRecipeHandler(ISiteService siteService, ISettingRedactionService settingRedactionService, IRealtimeFeedbackService realtimeFeedbackService)
         {
             _siteService = siteService;
-            _textRedactionService = textRedactionService;
+            _settingRedactionService = settingRedactionService;
             _realtimeFeedbackService = realtimeFeedbackService;
             Logger = NullLogger.Instance;
             T = NullLocalizer.Instance;
@@ -63,7 +63,7 @@ namespace CJP.ContentSync.RecipeHandlers {
 
         private void SetSetting(XAttribute attribute, ContentPart contentPart) {
             var attributeName = attribute.Name.LocalName;
-            var attributeValue = _textRedactionService.RestoreText(attribute.Value);
+            var attributeValue = _settingRedactionService.GetSettingValue(contentPart.PartDefinition.Name, attributeName, attribute.Value);
 
             _realtimeFeedbackService.Info(T("Updating site settings for {0}.{1}. Value being set to {2} ({3} before redactions)", contentPart.PartDefinition.Name, attributeName, attributeValue, attribute.Value));
             var property = contentPart.GetType().GetProperty(attributeName);

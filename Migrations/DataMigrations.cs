@@ -59,5 +59,25 @@ namespace CJP.ContentSync.Migrations
 
             return 5;
         }
+
+        public int UpdateFrom5()
+        {
+            SchemaBuilder.CreateTable(typeof(SettingRedactionRecord).Name, table => table
+                .Column<int>("Id", column => column.PrimaryKey().Identity())
+                .Column<string>("SettingName", column => column.Unlimited())
+                .Column<string>("Value", column => column.Unlimited()));
+
+            return 6;
+        }
+
+        public int UpdateFrom6()
+        {
+            SchemaBuilder.CreateTable(typeof(FeatureRedactionRecord).Name, table => table
+                .Column<int>("Id", column => column.PrimaryKey().Identity())
+                .Column<string>("FeatureId", column => column.Unlimited())
+                .Column<bool>("Enabled"));
+
+            return 7;
+        }
     }
 }

@@ -1,0 +1,38 @@
+﻿@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@using Orchard.Mvc.Html
+@model IEnumerable<CJP.ContentSync.Models.SnapshotRecord>
+
+    @{
+        Layout.Title = T("Content Sync - Snapshots");
+    }
+
+    <fieldset>
+        <legend>@T("Snapshots")</legend>
+        @T("Snapshots are a record of how your site looked at a certain point in time.")
+        <div class="manage">
+            @using (Html.BeginFormAntiForgeryPost(Url.Action("Take", "Snapshots", new { area = "CJP.ContentSync" }), FormMethod.Post))
+            {
+                <button type="submit">@T("Take a Snapshot")</button>
+            }
+        </div>
+        <br />
+        <br />
+        @if (Model.Any()) {
+            <table class="items">
+                <tr>
+                    <th>@T("Id")</th>
+                    <th>@T("Time Taken (UTC)")</th>
+                    <th></th>
+                </tr>
+                @foreach (var snapshot in Model) {
+                    <tr>
+                        <td>@snapshot.Id</td>
+                        <td>@snapshot.TimeTaken</td>
+                        <td>@Html.ActionLink(T("View").Text, "View", "Snapshots", new {snapshot.Id}, null)</td>
+                    </tr>
+                }
+            </table>
+        }
+    </fieldset>
+

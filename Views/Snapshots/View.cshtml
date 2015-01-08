@@ -1,0 +1,22 @@
+﻿@using System.Web.Mvc.Html
+@using Orchard.Mvc.Html
+@model CJP.ContentSync.Models.SnapshotRecord
+
+@{
+    Layout.Title = T("Content Sync - View Snapshot");
+}
+
+<div class="actions">
+    @Html.ActionLink("Back", "Index", "Snapshots", new { area = "CJP.ContentSync" }, new { @class="button" })
+</div>
+<br />
+<br />
+
+<pre>
+    @Model.Data
+</pre>
+<span class="hint">@T("This snapshot was taken at {0}", Model.TimeTaken)</span>
+
+<div class="actions">
+    @Html.ActionLink("Back", "Index", "Snapshots", new { area = "CJP.ContentSync" }, new { @class = "button" })
+</div>

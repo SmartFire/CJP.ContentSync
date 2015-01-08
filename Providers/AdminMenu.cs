@@ -17,8 +17,9 @@ namespace CJP.ContentSync.Providers
 
         private void BuildMenu(NavigationItemBuilder menu)
         {
-            menu.Add(T("Content Sync"), "10", item => item.Action("Index", "Admin", new { area = "CJP.ContentSync" }).Permission(ContentSyncPermissions.ContentSyncUI).LocalNav());
-            menu.Add(T("Redactions"), "10", item => item.Action("Index", "Redactions", new { area = "CJP.ContentSync" }).Permission(ContentSyncPermissions.RedactionManager).LocalNav());
+            menu.Add(T("Content Sync"), "10.0", item => item.Action("Index", "Admin", new { area = "CJP.ContentSync" }).Permission(ContentSyncPermissions.ContentSyncUI).LocalNav());
+            menu.Add(T("Redactions"), "10.1", item => item.Action("Index", "Redactions", new { area = "CJP.ContentSync" }).Permission(ContentSyncPermissions.RedactionManager).LocalNav());
+            menu.Add(T("Snapshots"), "10.2", item => item.Action("Index", "Snapshots", new { area = "CJP.ContentSync" }).Permission(ContentSyncPermissions.SnapshotManager).LocalNav());
         }
     }
 }

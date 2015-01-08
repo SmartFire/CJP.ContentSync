@@ -1,0 +1,30 @@
+﻿@using System.Web.Mvc.Html
+@using Orchard.Mvc.Html
+@model CJP.ContentSync.Models.SettingRedactionRecord
+
+@{
+    Layout.Title = T("Content Sync - Setting Redactions");
+}
+
+@using (Html.BeginFormAntiForgeryPost()) {
+    <div>
+        @Html.LabelFor(m => m.SettingName, T("Setting"))
+        @Html.TextBoxFor(m => m.SettingName)
+        <span class="hint">
+            @T("The setting that this value applies to. Should be in the format 'Part.Property' eg 'SiteSettingsPart.SiteOwner'")
+        </span>
+    </div>
+
+    <div>
+        @Html.LabelFor(m => m.Value, T("Value"))
+        @Html.TextBoxFor(m => m.Value)
+    </div>
+
+    <div class="actions">
+        @if (Model.Id != 0)
+        {
+            <button type="submit" name="delete" value="delete" class="button grey">@T("Delete")</button>
+        }
+        <button type="submit" name="save" value="save">@T("Save")</button>
+    </div>
+}
